@@ -47,3 +47,18 @@ unzip eigen-3.4.0.zip -d thirdparty
 ~~~
 pip install .
 ~~~
+
+# 下载权重文件并放于```checkpoints```文件夹
+~~~
+wget https://download.ifi.uzh.ch/rpg/web/data/iros24_rampvo/checkpoints/RAMPVO_MultiScale.pth
+
+wget https://download.ifi.uzh.ch/rpg/web/data/iros24_rampvo/checkpoints/RAMPVO_SingleScale.pth
+~~~
+
+# 运行验证的代码
+~~~
+python evaluate.py \
+  --weights=checkpoints/RAMPVO_MultiScale.pth \
+  --config_eval=config_net/MultiScale_EDS.json \
+  --config_VO=config_vo/default.yaml \
+~~~

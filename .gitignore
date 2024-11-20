@@ -1,6 +1,6 @@
 # # Distribution / packaging
 # .Python
-# build/
+build/
 # develop-eggs/
 # eggs/
 # .eggs/
@@ -34,7 +34,7 @@
 # trajectory_evaluation
 # DEBUG/
 # scripts/
-# checkpoints
+checkpoints/
 # datasets
 # datasets_pickle
 # results
