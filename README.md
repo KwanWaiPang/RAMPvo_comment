@@ -14,32 +14,36 @@
   </h3>
   <div align="center"></div>
 
+<p align="center">
+  <img width="80%" src="assets/encoder.jpg">
+</p>
+
 # 配置过程记录
 * 创建conda环境
 ~~~
 <!-- rm -rf .git -->
 
+conda env list
+conda remove -n rampvo --all
+
 conda env create -f environment.yml
-conda activate rampvo
-
 conda activate rampvo 
-~~~
-* 采用的服务器CUDA Version: 12.0；Python 3.10.15因此应该可以用下面的安装
-~~~
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 
-pip install -r requirements.txt
-~~~
-* 但是会报错显示"The detected CUDA version (11.7) mismatches the version that was used to compile PyTorch (12.4). Please make sure to use the same CUDA versions." 应该还是cuda版本不匹配，改为下面试试（注意需要把pip install -r requirements.txt中的torch-scatter注释掉）
-~~~
-pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+<!-- 下面用于检查安装的torch版本 -->
+python -c "import torch; print(torch.__version__)"
 
-pip install torch-scatter==2.0.9 -f https://data.pyg.org/whl/torch-1.11.0+cu113.html
-pip install -r requirements.txt
+<!-- 手动安装torch -->
+conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 cudatoolkit=11.6 -c pytorch -c conda-forge
 ~~~
+
 
 * 下载eigen
 ~~~
 wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip
 unzip eigen-3.4.0.zip -d thirdparty
+~~~
+
+* 安装Ramp VO
+~~~
+pip install .
 ~~~

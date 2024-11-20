@@ -1,0 +1,9 @@
+# ninja log v5
+0	19648	1732089008756890910	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/altcorr/correlation.o	99ffe7a7b104f7d5
+0	66842	1732089055934536920	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/altcorr/correlation_kernel.o	759b42df8f42fa9a
+0	23450	1732089079943337869	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/fastba/ba.o	597b1de8d2e18d24
+1	66413	1732089122896713470	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/fastba/ba_cuda.o	29910579641aad47
+1	66969	1732089123436730314	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/fastba/block_e.o	15007bd5afbb7d88
+0	23372	1732089147413467558	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/lietorch/src/lietorch.o	116cb423807896ee
+1	56931	1732089180958465094	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/lietorch/src/lietorch_cpu.o	563e61e192ceb8d1
+1	150756	1732089274721062973	/home/gwp/rampvo/build/temp.linux-x86_64-cpython-310/ramp/lietorch/src/lietorch_gpu.o	10fa2829c36e02e4
