@@ -24,3 +24,6 @@ dependencies:
     - evo
     - opencv-python
     - yacs
+    - h5py
+    - hdf5plugin
+    - scikit-learn

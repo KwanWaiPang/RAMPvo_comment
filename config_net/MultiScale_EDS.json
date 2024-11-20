@@ -37,15 +37,15 @@
             "all_events_in_sequence": true,
             "dataset_name": "EDS",
             "test_split": [
-                "datasets/EDS/EDS/00_peanuts_dark",
-                "datasets/EDS/EDS/01_peanuts_light",
-                "datasets/EDS/EDS/08_peanuts_running",
-                "datasets/EDS/EDS/02_rocket_earth_light",
-                "datasets/EDS/EDS/03_rocket_earth_dark",
-                "datasets/EDS/EDS/06_ziggy_and_fuzz",
-                "datasets/EDS/EDS/07_ziggy_and_fuzz_hdr",
-                "datasets/EDS/EDS/09_ziggy_flying_pieces",
-                "datasets/EDS/EDS/11_all_characters"
+                "/media/lfl-data2/EDS/00_peanuts_dark",
+                "/media/lfl-data2/EDS/01_peanuts_light",
+                "/media/lfl-data2/EDS/08_peanuts_running",
+                "/media/lfl-data2/EDS/02_rocket_earth_light",
+                "/media/lfl-data2/EDS/03_rocket_earth_dark",
+                "/media/lfl-data2/EDS/06_ziggy_and_fuzz",
+                "/media/lfl-data2/EDS/07_ziggy_and_fuzz_hdr",
+                "/media/lfl-data2/EDS/09_ziggy_flying_pieces",
+                "/media/lfl-data2/EDS/11_all_characters"
             ],
             "use_pose_pred": false
         }

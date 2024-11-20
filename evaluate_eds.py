@@ -1,6 +1,6 @@
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "8"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "8"
 
 import sys
 import glob
@@ -13,6 +13,12 @@ import numpy as np
 import os.path as osp
 from tqdm import tqdm
 from pathlib import Path
+
+# 处理服务器中evo的可视化问题
+import evo
+from evo.tools.settings import SETTINGS
+SETTINGS['plot_backend'] = 'Agg'
+
 from evo.core import sync
 from functools import partial
 import evo.main_ape as main_ape
@@ -43,30 +49,14 @@ sys.setrecursionlimit(100000)
 def set_global_params(K_path=None, standard_pose_format=False, resize_to=None):
     global fx, fy, cx, cy
 
-    if K_path is None or not os.path.exists(K_path):
-        fx, fy, cx, cy = [320, 320, 320, 240]
-        print("Using default intrinsics", [fx, fy, cx, cy])
-        return (fx, fy, cx, cy)
-    else:
-        # Load the YAML file
-        with open(K_path, "r") as file:
-            data = yaml.safe_load(file)
+    # Extract the intrinsics
+    intrinsics = np.loadtxt(K_path, delimiter=" ")
 
-        # Extract the intrinsics
-        intrinsics = data["cam0"]["intrinsics"]
-
-        # Extract the individual components
-        fx, fy, cx, cy = intrinsics
-
-    if resize_to is not None:
-        resolution = data["cam0"]["resolution"]
-        slack = np.array(resize_to) - np.array(resolution)
-        d_cx, d_cy = slack[0] / 2, slack[1] / 2
-        cx = cx + d_cx
-        cy = cy + d_cy
+    # Extract the individual components
+    fx, fy, cx, cy = intrinsics[:4]
 
     print("Using intrinsics from {}".format(K_path), (fx, fy, cx, cy))
-    return (fx, fy, cx, cy)
+    return (fx, fy, cx, cy) #返回相机内参
 
 
 def save_results(
@@ -98,15 +88,15 @@ def save_results(
 def data_loader_all_events(
     config, full_scene, downsample_fact=1, norm_to=None, extension=".png"
 ):
-    images_paths = osp.join(full_scene, "image_left", "*{}".format(extension))
+    images_paths = osp.join(full_scene, "images_undistorted_calib1", "*{}".format(extension))#图像的路径
     imfiles = sorted(glob.glob(images_paths))
     evfile = osp.join(full_scene, "events.h5")
     intrinsics = torch.as_tensor([fx, fy, cx, cy])
     TartanEvent_loader = TartanEvent(config=config, path=full_scene)
-    timestamps = np.loadtxt(osp.join(full_scene, "timestamps.txt"))
+    timestamps = np.loadtxt(osp.join(full_scene, "images_timestamps.txt"))#图像的时间戳，单位为微秒
 
     # skip first element (no events for it)
-    image_files = sorted(imfiles)[1 :: downsample_fact]
+    image_files = sorted(imfiles)[1 :: downsample_fact]#downsample_fact为跳过的帧数
     corresponding_timestamps = timestamps[1 :: downsample_fact]
 
     # load events and compute how many are they
@@ -129,6 +119,7 @@ def data_loader_all_events(
     for i in tqdm(range(n_events_voxels)):
         i0 = i1
         i1 = i1 + n_events_selected
+        # 也是以voxel为单位的
         event_voxel = TartanEvent_loader.events_from_indices(
             event=event, i_start=i0, i_stop=i1
         )
@@ -254,7 +245,7 @@ def run(cfg_VO, network, eval_cfg, data_list):
         slam.update()
     return slam.terminate()
 
-
+# 评估一个序列
 def evaluate_sequence(
     config_VO, net, eval_cfg, data_list, traj_ref, use_pose_pred, img_timestamps,
 ):
@@ -277,12 +268,14 @@ def evaluate_sequence(
             cfg_VO=config_VO, network=net, eval_cfg=eval_cfg, data_list=data_list
         )
 
+    # 将结果转换为PoseTrajectory3D格式
     traj_est_ = PoseTrajectory3D(
         positions_xyz=traj_est[:, :3],
         orientations_quat_wxyz=traj_est[:, 3:][:, (1, 2, 3, 0)],
         timestamps=img_timestamps,
     )
 
+    # 进行evo评估
     try:
         traj_ref, traj_est = sync.associate_trajectories(traj_ref, traj_est_)
         result = main_ape.ape(
@@ -324,41 +317,22 @@ def evaluate(
         print(f"loading training data ... scene:{scene}")
         if not os.path.exists(scene):
             raise FileNotFoundError(f"scene {scene} not found")
-        traj_ref_path = osp.join(scene, "pose_left.txt") #参考轨迹（真值）的路径
+        traj_ref_path = osp.join(scene, "stamped_groundtruth.txt") #参考轨迹（真值）的路径
         scene_name = os.path.basename(scene) if os.path.isdir(scene) else scene
-        timestamps_path = osp.join(scene, "timestamps.txt")
+        timestamps_path = osp.join(scene, "images_timestamps.txt")#应该是图像的时间戳
         img_timestamps = np.loadtxt(timestamps_path)
 
-        if "Tartan" in dataset_name:
-            set_global_params(K_path=osp.join(scene, "K.yaml"))
-            traj_ref = read_tartan_format_poses(
-                traj_path=traj_ref_path, timestamps_path=timestamps_path
-            )
-        elif "StereoDavis" in dataset_name:
+        if "EDS" in dataset_name:#如果是EDS数据集
             set_global_params(
-                K_path=osp.join(scene, "K.yaml"),
-                standard_pose_format=True,
+                K_path=osp.join(scene, "calib_undist_calib1_rgb.txt"),#相机内参
+                # standard_pose_format=True,
             )
-            img_timestamps = img_timestamps / 1e6
-            traj_ref = read_stereodavis_format_poses(
-                traj_path=osp.join(scene, "poses.txt"),
-                timestamps_path=osp.join(scene, "timestamps_poses.txt"),
-            )
-        elif "EDS" in dataset_name:#如果是EDS数据集
-            set_global_params(
-                K_path=osp.join(scene, "K.yaml"),
-                standard_pose_format=True,
-            )
-            img_timestamps = img_timestamps / 1e6
-            traj_ref = read_eds_format_poses(traj_ref_path)
-        elif "MoonLanding" in dataset_name:
-            set_global_params(K_path=osp.join(scene, "K.yaml"))
-            traj_ref = read_moonlanding_format_poses(
-                traj_path=traj_ref_path, timestamps_path=timestamps_path
-            )
-        else:
+            img_timestamps = img_timestamps / 1e6 #读入的为微妙，转换为秒
+            traj_ref = read_eds_format_poses(traj_ref_path) #读取参考轨迹
+        else: #此py文件仅支持EDS数据集
             raise NotImplementedError("dataset not supported")
 
+        # 读入所有event数据
         data_list, frame_indices = data_loader_all_events(
             config=eval_cfg,
             full_scene=scene,
@@ -366,6 +340,7 @@ def evaluate(
             norm_to=norm_to,
         )
 
+        # 进行验证
         eval_subtraj = partial(
             evaluate_sequence,
             config_VO=config_VO,

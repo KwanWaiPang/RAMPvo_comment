@@ -62,3 +62,5 @@ python evaluate.py \
   --config_eval=config_net/MultiScale_EDS.json \
   --config_VO=config_vo/default.yaml \
 ~~~
+
+# 更新了debug模式

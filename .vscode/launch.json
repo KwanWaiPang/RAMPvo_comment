@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "eds",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "evaluate_eds.py",
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "1",
+                "PYTHONPATH": "/home/gwp/rampvo"  // 添加路径
+            },
+            "args":[
+                "--weights=checkpoints/RAMPVO_MultiScale.pth",
+                "--config_eval=config_net/MultiScale_EDS.json",
+                "--config_VO=config_vo/default.yaml",
+            ]
+
+        },
+    ]
+}
