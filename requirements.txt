@@ -1,7 +1,7 @@
 # Required Libraries for Ramp VO
 numpy==1.24.4
 matplotlib==3.4.3
-torch-scatter
+# torch-scatter
 tensorboard
 numba
 tqdm
