@@ -88,7 +88,7 @@ class EventRGBDAugmentor(RGBDAugmentor):
         if np.random.rand() < 0.5:
             images = self.color_transform(images)
         
-        images, poses, depths, intrinsics, scale = self.spatial_transform(images, depths, poses, intrinsics)
-        events = self._spatial_transform(events, scale=scale)
+        images, poses, depths, intrinsics, scale = self.spatial_transform(images, depths, poses, intrinsics)#图片的空间变换（数据增广）
+        events = self._spatial_transform(events, scale=scale)#事件的空间变换（数据增广）
 
         return events, images, poses, depths, intrinsics
