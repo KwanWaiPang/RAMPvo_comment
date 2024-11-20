@@ -55,6 +55,11 @@ wget https://download.ifi.uzh.ch/rpg/web/data/iros24_rampvo/checkpoints/RAMPVO_M
 wget https://download.ifi.uzh.ch/rpg/web/data/iros24_rampvo/checkpoints/RAMPVO_SingleScale.pth
 ~~~
 
+# 下载TartanEvent.pickle文件并放于```datasets_pickle```文件夹
+~~~
+wget https://download.ifi.uzh.ch/rpg/web/data/iros24_rampvo/datasets/TartanEvent.pickle
+~~~
+
 # 运行验证的代码
 ~~~
 python evaluate.py \

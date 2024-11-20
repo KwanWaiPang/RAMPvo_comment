@@ -91,7 +91,7 @@ def data_loader_all_events(
     images_paths = osp.join(full_scene, "images_undistorted_calib1", "*{}".format(extension))#图像的路径
     imfiles = sorted(glob.glob(images_paths))
     evfile = osp.join(full_scene, "events.h5")
-    intrinsics = torch.as_tensor([fx, fy, cx, cy])
+    intrinsics = torch.as_tensor([fx, fy, cx, cy])#自动读取前面的相机内参
     TartanEvent_loader = TartanEvent(config=config, path=full_scene)
     timestamps = np.loadtxt(osp.join(full_scene, "images_timestamps.txt"))#图像的时间戳，单位为微秒
 
@@ -100,7 +100,7 @@ def data_loader_all_events(
     corresponding_timestamps = timestamps[1 :: downsample_fact]
 
     # load events and compute how many are they
-    event = H5EventHandle.from_path(Path(evfile))
+    event = H5EventHandle.from_path(Path(evfile),height=480, width=640)
     n_events = len(event.t)
     n_events_selected = TartanEvent_loader.num_events_selected
     n_events_voxels = n_events // n_events_selected
